@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <gsk-loading v-if="loading" />
-    <gsk-map></gsk-map>
+    <gsk-map v-else :mapList="mapList" :background="background" :logo="logo" :bgm="bgm"></gsk-map>
   </div>
 </template>
 <script>

@@ -121,7 +121,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .loading {
   width: 40%;
   margin: auto;
@@ -202,7 +202,7 @@ export default {
 
 .load {
   display: block;
-  width: 150px;
+  width: 200px;
   line-height: 20px;
   /* 行高 */
   letter-spacing: 5px;
