@@ -3,7 +3,7 @@
     <!-- 导航栏 -->
     <div class="card-holder">
       <p>详细地点仅做标记，无跳转</p>
-      <div class="card-wrapper" v-for="map in userMapList">
+      <div class="card-wrapper" v-for="map in mapList">
         <div
           class="card"
           :style="{ background: map.mapColor }"
@@ -15,7 +15,7 @@
           <div
             class="seccard-item"
             v-for="submap in map.subMap"
-            :style="{ background: submap.find ? map.mapColor : '' }"
+            :style="{ background: map.mapColor }"
           >
             <span class="seccard-content" v-text="submap.mapName"></span>
           </div>
@@ -47,12 +47,9 @@
     </div>
     <!-- 音乐END -->
 
-    <!-- 通关标记 -->
-    <div class="clearMap" v-show="clearStatus">Clear！！</div>
-
     <!-- 地图本体 -->
     <div class="root">
-      <template v-for="map in userMapList">
+      <template v-for="map in mapList">
         <div
           v-for="submap in map.subMap"
           :key="submap.mapID"
@@ -87,16 +84,11 @@
   </div>
 </template>
 <script>
-import $ from "jquery";
 export default {
   name: "gsk-map",
   data() {
     return {
-      userMapList: [],
-
       loaded: false,
-
-      clearStatus: false,
     };
   },
   props: {
@@ -114,39 +106,7 @@ export default {
       default: new Image(),
     },
   },
-  created() {
-    const _this = this;
-    let mapList = [...this.mapList];
-    mapList.map((v, i) => {
-      v = v.subMap.map((v1, i1) => {
-        if (this.readRec(v1.mapID)) {
-          v1.find = true;
-        }
-        return v1;
-      });
-      return v;
-    });
-    this.userMapList = mapList;
-    if (this.getUnfindMapCount().length <= 0) {
-      this.clearStatus = true;
-    }
-
-    let pointer = 0;
-    $(document).on("keydown.passwordCheck", (event) => {
-      let callAction = [71, 69, 78, 83, 79, 75, 89, 79];
-      if (
-        event.keyCode == callAction[pointer] ||
-        event.which === callAction[pointer]
-      ) {
-        pointer++;
-      } else {
-        pointer = 0;
-      }
-      if (pointer >= callAction.length) {
-        _this.test();
-      }
-    });
-  },
+  created() {},
   mounted() {
     this.loaded = true;
   },
@@ -162,43 +122,11 @@ export default {
     },
   },
   methods: {
-    test() {
-      let mapList = this.mapList;
-      mapList.map((v, i) => {
-        v = v.subMap.map((v1, i1) => {
-          //if (i != 0 || i1 != 0) {
-          v1.find = true;
-          this.writeRec(v1.mapID);
-          //}
-          return v1;
-        });
-        return v;
-      });
-      this.mapList = mapList;
-      this.clear();
-    },
     showMsg(map) {
-      const _this = this;
-      let lastFind = false;
-      if (!map.find) {
-        let unfind = this.getUnfindMapCount();
-        if (unfind.length === 1) lastFind = true;
-        map.find = true;
-        this.$message({
-          message: "发现了新地点：" + map.mapName,
-          type: "success",
-        });
-        this.writeRec(map.mapID);
-      }
       this.$alert(this.parseText(map.mapDesc), map.mapName, {
         closeOnClickModal: true,
         dangerouslyUseHTMLString: true,
         roundButton: true,
-        callback: function (action) {
-          if (lastFind) {
-            _this.clear();
-          }
-        },
       });
     },
     moveMap(map) {
@@ -207,40 +135,10 @@ export default {
     },
     moveMapByName(mapName) {
       if (this.$refs[mapName]) {
-        $("html,body").animate(
-          { scrollTop: this.$refs[mapName][0].offsetTop },
-          500
-        );
-      }
-    },
-    getUnfindMapCount() {
-      let unfind = this.userMapList.filter((v) => {
-        let tmp = v.subMap.filter((v1) => !v1.find);
-        return tmp.length > 0;
-      });
-      return unfind;
-    },
-    clear() {
-      let unfind = this.getUnfindMapCount();
-      if (unfind.length <= 0) {
-        this.$message({
-          message: "已解锁所有地点！",
-          type: "success",
+        window.scrollTo({
+          top:this.$refs[mapName][0].offsetTop,
+          behavior: "smooth"
         });
-        this.clearStatus = true;
-      }
-    },
-    readRec(mapName) {
-      let storage = window.localStorage.getItem("mapList") || "";
-      storage = storage.split(",").filter((v) => v !== "");
-      return storage.indexOf(mapName) >= 0;
-    },
-    writeRec(mapName) {
-      let storage = window.localStorage.getItem("mapList") || "";
-      storage = storage.split(",").filter((v) => v !== "");
-      if (storage.indexOf(mapName) <= 0) {
-        storage.push(mapName);
-        window.localStorage.setItem("mapList", storage.join());
       }
     },
     parseText(text) {
@@ -441,16 +339,6 @@ a {
       fill: #1296db;
     }
   }
-}
-.clearMap {
-  margin-top: 2rem;
-  position: fixed;
-  z-index: 2000;
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #eee;
-  text-shadow: -1px 0 0.4rem rgb(255, 196, 0), 0 1px 0.4rem rgb(255, 196, 0),
-    1px 0 0.4rem rgb(255, 196, 0), 0 -1px 0.4rem rgb(255, 196, 0);
 }
 .root {
   position: relative;
