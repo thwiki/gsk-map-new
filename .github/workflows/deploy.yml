@@ -15,16 +15,16 @@ jobs:
       # check it to your workflow can access it
       # from: https://github.com/actions/checkout
       - name: 1. 检查master分支
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # from: https://github.com/actions/setup-node
       - name: 2. 设置Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
       - name: 3. 缓存
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         id: cache-dependencies
         with:
           path: node_modules
